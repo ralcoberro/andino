@@ -46,7 +46,7 @@ Projects built upon Andino! :rocket:
 - :robot: [`andino_rmf`](https://github.com/Ekumen-OS/andino_rmf): [OpenRMF](https://www.open-rmf.org/) integration of Andino simulation.
 - :test_tube: [`andino_integration_tests`](https://github.com/Ekumen-OS/andino_integration_tests): Extension to the Andino robot showing how to build integration tests.
 - :framed_picture: [`andino_lichtblick`](https://github.com/Ekumen-OS/andino_lichtblick): [Lichtblick](https://github.com/lichtblick-suite/lichtblick/) integration with Andino for web-based visualization.
-- :crab: [`andino-rs`](https://github.com/Ekumen-OS/andino_lichtblick): Rustacean version of *andino* robot. It also provides integration with [*dora*](https://github.com/dora-rs/dora) framework for both real and simulated *andino*.
+- :crab: [`andino-rs`](https://github.com/Ekumen-OS/andino-rs): Rustacean version of *andino* robot. It also provides integration with [*dora*](https://github.com/dora-rs/dora) framework for both real and simulated *andino*.
 - :nerd_face: [`robotics_essentials_ros2`](https://github.com/henki-robotics/robotics_essentials_ros2): ROS 2 Essentials material for robotic course at [*University of Eastern Finland*](https://www.uef.fi/en).
 
 ## :busts_in_silhouette: Community
