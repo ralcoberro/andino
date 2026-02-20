@@ -1,18 +1,27 @@
-FROM osrf/ros:humble-desktop-full
+# Build argument for ROS distro (humble or jazzy)
+ARG ROS_DISTRO=humble
+FROM osrf/ros:${ROS_DISTRO}-desktop-full
 
 # Arguments for building
 ARG USERID
 ARG USER
+ARG ROS_DISTRO
 
 # Setup environment
-ENV TERM linux
-ENV DEBIAN_FRONTEND noninteractive
+ENV TERM=linux
+ENV DEBIAN_FRONTEND=noninteractive
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # Copy requirement files and install dependencies
 COPY docker/requirements.txt .
 RUN apt-get update && apt-get install --no-install-recommends -y $(cat requirements.txt)
 RUN rm requirements.txt
+
+# Copy ROS requirement files and install ROS dependencies
+# This pre-installs ROS dependencies to speed up rosdep install
+COPY docker/ros_requirements.txt .
+RUN apt-get update && apt-get install --no-install-recommends -y $(sed "s/\${ROS_DISTRO}/${ROS_DISTRO}/g" ros_requirements.txt | grep -v '^#' | grep -v '^$')
+RUN rm ros_requirements.txt
 
 # Create a user with passwordless sudo
 RUN adduser --uid $USERID --gecos "ekumen developer" --disabled-password $USER
@@ -30,12 +39,10 @@ RUN sudo usermod -a -G plugdev $USER
 # Creates the src folder of the workspace.
 RUN mkdir -p /home/$USER/ws/src
 
-# Adds to bashrc the ros humble overlay sourcing.
-RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USER/.bashrc
+# Adds to bashrc the ROS overlay sourcing.
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USER/.bashrc
 # Adds colcon autocomplete
 RUN echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> /home/$USER/.bashrc
-# Adds gazebo sourcing.
-RUN echo "source /usr/share/gazebo/setup.bash" >> /home/$USER/.bashrc
 
 # Updates
 RUN sudo apt upgrade -y && sudo apt update && rosdep update

@@ -104,10 +104,15 @@ You can either follow these steps or **rely on community contribution (Recommend
 
 ### Operative System
 
-Ubuntu Mate 22.04 ARM64 is the recommended operative system for this project. This OS provides good capabilities for a educational platform as well as good performance.
+The recommended operative system depends on which ROS 2 distro you want to use:
+- **Humble**: Ubuntu Mate 22.04 ARM64 - [Download](https://ubuntu-mate.org/download/arm64/)
+- **Jazzy**: Ubuntu Server/Desktop 24.04 - [Download](https://ubuntu.com/download/raspberry-pi)
+
+> [!IMPORTANT]
+> It should work with either Desktop or Server versions. Desktop versions naturally are slower. Refer to https://ubuntu.com/download/raspberry-pi for general information on Ubuntu installation on Raspberry Pi.
 
 For installing this OS in the Raspberry:
-1. Download the image from here: [ubuntu mate download](https://ubuntu-mate.org/download/arm64/)
+1. Download the image for your target ROS distro (see above).
 
 
 2. Install OS to a microSD card using [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
@@ -160,11 +165,14 @@ sudo apt install git net-tools software-properties-common build-essential -y
 sudo apt install python3-rosdep2 python3-catkin-pkg python3-catkin-pkg-modules python3-rospkg-modules python3-rospkg  -y
 ```
 
-#### Install ROS
+#### Install ROS and Tools
 
-Follow suit the instructions for installing next dependencies from binaries:
- - [ROS 2 Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
  - [Colcon](https://colcon.readthedocs.io/en/released/user/installation.html)
+Follow suit the instructions for installing next dependencies from binaries:
+ - [ROS 2 Humble(If Ubuntu 22.04)](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+ - [ROS 2 Jazzy(If Ubuntu 24.04)](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debians.html)
+      > [!IMPORTANT] It is worth checking out official instructions on installing ROS on Raspberry PI platforms, in particular for Jazzy onwards.
+    > See [here](https://docs.ros.org/en/jazzy/How-To-Guides/Installing-on-Raspberry-Pi.html#ros-2-on-raspberry-pi): Relying on noble-backports in Ubuntu Noble (24.04) is necessary.
 
 To automatically source ROS installation, it is recommended to add `source /opt/ros/humble/setup.bash` line to the `~/.bashrc` file.
 
@@ -185,13 +193,13 @@ Configure it properly:
    sudo usermod -a -G plugdev $USER
    ```
    Note you will need a reboot after this to be effective.
-2. Remove `brltty` from the system
-   ```
-   sudo apt remove brltty
-   ```
-   In Ubuntu 22.04 seems to be an issue with some chip drivers and the `brltty` daemon. To avoid this conflict we remove `brltty` as suggested. See [this stackoverflow post](https://stackoverflow.com/questions/70123431/why-would-ch341-uart-is-disconnected-from-ttyusb) for further information.
 
-
+> [!IMPORTANT]
+> In Ubuntu 22.04 seems to be an issue with some chip drivers and the `brltty` daemon. To avoid ?> this conflict we remove `brltty` as suggested. See [this stackoverflow post](https://stackoverflow.com/>? > questions/70123431/why-would-ch341-uart-is-disconnected-from-ttyusb) for further information.
+> - Remove `brltty` from the system
+    ```
+    sudo apt remove brltty
+    ```
 
 #### Raspberry Camera Module V2
 
@@ -216,7 +224,7 @@ Modify the `config.txt` file for the boot:
  sudo nano /boot/firmware/config.txt
 ```
 
-And add these lines:
+And add these lines under `[all]`:
 
 ```
 # Autoload overlays for any recognized cameras or displays that are attached
@@ -229,6 +237,7 @@ gpu_mem=128
 Save and close the file. Then we need to enable the camera support for the raspberry:
 
 ```sh
+sudo apt install raspi-config
 sudo raspi-config
 ```
 
@@ -308,6 +317,8 @@ In order to create fixed names for the USB devices follow the instructions:
     SUBSYSTEM=="tty", ATTRS{idProduct}=="7523", ATTRS{idVendor}=="1a86", SYMLINK+="ttyUSB_ARDUINO"
     SUBSYSTEM=="tty", ATTRS{idProduct}=="ea60", ATTRS{idVendor}=="10c4", SYMLINK+="ttyUSB_LIDAR"
     ```
+    > [!IMPORTANT]
+    You should be using your own information you obtained from previous commands, this is just an example.
     Note that in the `symlink` field a fixed name is indicated.
 
 4. Re-trigger the device manager:
@@ -335,47 +346,47 @@ For more information you can take a look at this external tutorial: [Here](https
 
 Let's create our workspace and build from source this repository.
 
-```
+```bash
 cd ~
 ```
-```
+```bash
 mkdir robot_ws/src -p
 ```
 Clone this repository in the `src` folder
-```
+```bash
 cd robot_ws/src
 ```
-```
+```bash
 git clone <repository_address>
 ```
 Install dependencies via rosdep:
-```
+```bash
 cd ~/robot_ws
 ```
 When it is the first time you run `rosdep`:
-```
+```bash
 rosdep update
 ```
-Make sure to export the `ROS_DISTRO` environment variable:
-```
-export ROS_DISTRO=humble
+Make sure to export the `ROS_DISTRO` environment variable (use `humble` or `jazzy` depending on your installation):
+```bash
+export ROS_DISTRO=humble  # or jazzy
 ```
 And then proceed to install the workspace dependencies:
-```
+```bash
 rosdep install --from-paths src -i -y -r
 ```
 Note that option `-r` has been added. For ARM based processors, there are missing packages, e.g. those related to simulation. We would not try to run the simulation in the compute platform of andino, however for convenience it is added here.
 
-Let' source the ROS Humble installation:
+Let's source the ROS installation:
+```bash
+source /opt/ros/$ROS_DISTRO/setup.bash
 ```
-source /opt/ros/humble/setup.bash
-```
-Let's build the packages (`andino_gz_classic` and `andino_apps` work only in simulation):
-```
-colcon build --packages-skip andino_gz_classic andino_apps
+Let's build the packages:
+```bash
+colcon build
 ```
 After building is completed:
-```
+```bash
 source install/setup.bash
 ```
 
