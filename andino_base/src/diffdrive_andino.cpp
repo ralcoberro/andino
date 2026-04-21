@@ -34,8 +34,9 @@
 
 namespace andino_base {
 
-hardware_interface::CallbackReturn DiffDriveAndino::on_init(const hardware_interface::HardwareInfo& info) {
-  if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
+hardware_interface::CallbackReturn DiffDriveAndino::on_init(
+    const hardware_interface::HardwareComponentInterfaceParams& params) {
+  if (hardware_interface::SystemInterface::on_init(params) != hardware_interface::CallbackReturn::SUCCESS) {
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -58,7 +59,7 @@ hardware_interface::CallbackReturn DiffDriveAndino::on_init(const hardware_inter
                (kEncTicksPerRevParam + static_cast<std::string>(": ") + info_.hardware_parameters[kEncTicksPerRevParam])
                    .c_str());
 
-  for (const hardware_interface::ComponentInfo& joint : info.joints) {
+  for (const hardware_interface::ComponentInfo& joint : info_.joints) {
     // DiffDriveAndino has exactly two states and one command interface on each joint
     if (joint.command_interfaces.size() != 1) {
       RCLCPP_FATAL(logger_, "Joint '%s' has %zu command interfaces found. 1 expected.", joint.name.c_str(),

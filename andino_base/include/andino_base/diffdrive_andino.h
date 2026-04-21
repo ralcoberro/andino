@@ -53,7 +53,8 @@ class DiffDriveAndino : public hardware_interface::SystemInterface {
   /// @brief Default constructor for the DiffDriveAndino class.
   DiffDriveAndino() = default;
 
-  hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo& info) override;
+  hardware_interface::CallbackReturn on_init(
+      const hardware_interface::HardwareComponentInterfaceParams& params) override;
 
   hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State& previous_state) override;
 
